@@ -1,8 +1,9 @@
 export interface RegisterForm {
-	dodid: string | number
-	dodid_confirm?: string | number
+	dodid: string
+	dodid_confirm?: string
 	rank: string
 	name?: {
+		full?: string
 		last?: string
 		first?: string
 		middle?: string
@@ -12,7 +13,7 @@ export interface RegisterForm {
 	middle?: string
 	no_middle?: boolean
 	email: string
-	phone: string | number
+	phone: string
 	platoon: string
 	squad: string
 	password: string

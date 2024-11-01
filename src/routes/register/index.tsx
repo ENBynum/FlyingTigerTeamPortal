@@ -1,6 +1,8 @@
+import { TransformedValues } from '@mantine/form'
 import { useDocumentTitle, useWindowScroll } from '@mantine/hooks'
 import { useEffect } from 'react'
 import { isMobileOnly } from 'react-device-detect'
+import RegisterRequest from '../../utils/constructs/api/register-request.ts'
 import { RankType } from '../../utils/types/profile.ts'
 import { RegisterFormProvider, useRegisterForm } from './components/shared.ts'
 import MobileView from './device-views/mobile.tsx'
@@ -62,9 +64,21 @@ export default function RegisterRoute() {
 		})
 	})
 	
-	// eslint-disable-next-line
-	function handleSubmit(data: any) {
-		console.log(data)
+	function handleSubmit(data: TransformedValues<typeof form>) {
+		// const res: JSONResponse = new RegisterRequest(data).submit()
+		// if (res.error) {
+		// 	notifications.show({
+		// 		position: 'top-center',
+		// 		withCloseButton: false,
+		// 		autoClose: 3000,
+		// 		message: res.error,
+		// 		color: 'red'
+		// 	})
+		// } else {
+		// 	navigate('/sign-in')
+		// }
+		const req = new RegisterRequest(data)
+		console.log(req.doc())
 	}
 	
 	return <>

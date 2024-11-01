@@ -1,26 +1,14 @@
+import { RegisterForm } from '../../../routes/register/types.ts'
 import server from '../../axios/axiosConfig.ts'
-import { RankType } from '../../types/profile.ts'
 import JSONResponse, { JSONResponseData } from './response.ts'
 
 
 
 interface Name {
-	full: string
-	last: string
-	first: string
+	full?: string
+	last?: string
+	first?: string
 	middle?: string
-}
-
-
-export interface RegisterRequestData {
-	dodid: string
-	rank: RankType
-	name: Name
-	platoon: string
-	squad: string
-	email: string
-	phone: string
-	password: string
 }
 
 
@@ -31,15 +19,15 @@ export interface RegisterRequestData {
 
 export default class RegisterRequest {
 	dodid: string
-	rank: RankType
-	name: Name
+	rank: string
+	name?: Name
 	platoon: string
 	squad: string
 	email: string
 	phone: string
 	password: string
-
-	constructor({ dodid, rank, name, platoon, squad, email, phone, password }: RegisterRequestData) {
+	
+	constructor({ dodid, rank, name, platoon, squad, email, phone, password }: RegisterForm) {
 		this.dodid = dodid
 		this.rank = rank
 		this.name = name
@@ -49,7 +37,7 @@ export default class RegisterRequest {
 		this.phone = phone
 		this.password = password
 	}
-
+	
 	submit(): JSONResponse {
 		const response: JSONResponse = new JSONResponse()
 		server.post('', this.doc())
@@ -67,10 +55,10 @@ export default class RegisterRequest {
 				}
 				response.set(data)
 			})
-
+		
 		return response
 	}
-
+	
 	doc() {
 		return {
 			dodid: this.dodid,

@@ -4,4 +4,3 @@ export type CommissionedType = '2LT' | '1LT' | 'CPT'
 export type RankType = EnlistedType | WarrantType | CommissionedType
 
 export type PlatoonType = 'Headquarters' | 'Maintenance' | 'Shops'
-export type SquadType = ''
