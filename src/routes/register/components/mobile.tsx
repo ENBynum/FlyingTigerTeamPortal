@@ -334,20 +334,6 @@ function UserPhone() {
 		{...form.getInputProps('phone')}
 		error={form.errors.phone}
 	/>
-	// return <>
-	// 	<NumberInput
-	// 		type={'tel'}
-	// 		id={'register-phone'}
-	// 		w={'100%'}
-	// 		label={'Phone Number'}
-	// 		required
-	// 		hideControls
-	// 		leftSection={'+1'}
-	// 		key={form.key('phone')}
-	// 		{...form.getInputProps('phone')}
-	// 		error={form.errors.phone}
-	// 	/>
-	// </>
 }
 
 export function Contact() {
