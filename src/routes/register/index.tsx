@@ -1,4 +1,5 @@
-import { useDocumentTitle } from '@mantine/hooks'
+import { useDocumentTitle, useWindowScroll } from '@mantine/hooks'
+import { useEffect } from 'react'
 import { isMobileOnly } from 'react-device-detect'
 import { RankType } from '../../utils/types/profile.ts'
 import { RegisterFormProvider, useRegisterForm } from './components/shared.ts'
@@ -9,7 +10,12 @@ import { RegisterForm } from './types.ts'
 
 export default function RegisterRoute() {
 	useDocumentTitle('Register - Flying Tigers Team Portal')
-
+	const scroll = useWindowScroll()[1]
+	
+	useEffect(() => {
+		scroll({ y: 0 })
+	}, [scroll])
+	
 	const form = useRegisterForm({
 		mode: 'uncontrolled',
 		initialValues: {
@@ -55,13 +61,26 @@ export default function RegisterRoute() {
 			password: values.password
 		})
 	})
-
-
-
+	
+	// eslint-disable-next-line
+	function handleSubmit(data: any) {
+		console.log(data)
+	}
+	
 	return <>
 		<RegisterFormProvider form={form}>
-			{isMobileOnly && <MobileView/>}
+			<form
+				id={'register-form'}
+				onSubmit={form.onSubmit(handleSubmit)}
+				style={{
+					width: '100%',
+					height: 'fit-content',
+					paddingBottom: '2.5rem'
+				}}
+			>
+				{isMobileOnly && <MobileView/>}
+			</form>
 		</RegisterFormProvider>
 	</>
-
+	
 }

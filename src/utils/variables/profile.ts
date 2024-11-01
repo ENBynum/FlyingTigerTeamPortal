@@ -2,10 +2,13 @@ export type EnlistedType = 'PVT' | 'PV2' | 'PFC' | 'SPC' | 'CPL' | 'SGT' | 'SSG'
 export type WarrantType = 'WO1' | 'CW2' | 'CW3' | 'CW4' | 'CW5'
 export type CommissionedType = '2LT' | '1LT' | 'CPT'
 
+export const EnlistedRanks = ['PVT', 'PV2', 'PFC', 'SPC', 'CPL', 'SGT', 'SSG', 'SFC', '1SG']
+export const WarrantRanks = ['WO1', 'CW2', 'CW3', 'CW4', 'CW5']
+export const CommissionedRanks = ['2LT', '1LT', 'CPT']
 export const Ranks = [
-	{ group: 'Enlisted', items: ['PVT', 'PV2', 'PFC', 'SPC', 'CPL', 'SGT', 'SSG', 'SFC', '1SG'] },
-	{ group: 'Warrant', items: ['WO1', 'CW2', 'CW3', 'CW4', 'CW5'] },
-	{ group: 'Commissioned', items: ['2LT', '1LT', 'CPT'] }
+	{ group: 'Enlisted', items: EnlistedRanks },
+	{ group: 'Warrant', items: WarrantRanks },
+	{ group: 'Commissioned', items: CommissionedRanks }
 ]
 
 export const Platoons = [
