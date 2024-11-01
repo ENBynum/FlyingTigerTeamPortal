@@ -1,27 +1,22 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createSlice } from '@reduxjs/toolkit'
+import User from '../../utils/constructs/models/user.ts'
 
 
 
-interface AuthState {
-	user: string | undefined
+export interface AuthState {
+	user: User
 }
 
+
 const initialState: AuthState = {
-	user: undefined
+	user: new User()
 }
 
 const AuthSlice = createSlice({
 	name: 'auth',
 	initialState,
-	reducers: {
-		login: (state, action: PayloadAction<string>) => {
-			state.user = action.payload
-		},
-		logout: (state) => {
-			state.user = undefined
-		}
-	}
+	reducers: {}
 })
 
-export const { login, logout } = AuthSlice.actions
+// export const {} = AuthSlice.actions
 export const AuthReducer = AuthSlice.reducer
