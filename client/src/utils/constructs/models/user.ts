@@ -34,20 +34,22 @@ export default class User {
 		this.role = undefined
 	}
 
-	login({ dodid, role, platoon, squad }: LoginAPIResponseData): string {
+	login({ dodid, role, platoon, squad }: LoginAPIResponseData): void {
 		this.dodid = dodid
 		this.role = role
 		this.platoon = platoon
 		this.squad = squad
+	}
 
-		if (role === 'User') {
-			return `/user/dashboard/${dodid}`
+	login_redirect(): string {
+		if (this.role === 'User') {
+			return `/user/dashboard/${this.dodid}`
 		} else {
 			return '/'
 		}
 	}
 
-	signature() {
+	signature(): string | undefined {
 		let profile: Profile | undefined = undefined
 		let user_signature: string = ''
 		server.get('')

@@ -1,7 +1,9 @@
 import { RSTForm } from '../../../routes/__user-routes/request-rst/utils/rst-form'
-import { AbsenceTypeType, MakeUpUniformType } from '../../../routes/__user-routes/request-rst/utils/types'
+import {
+	AbsenceTypeType, MakeUpUniformType
+} from '../../../routes/__user-routes/request-rst/utils/types'
 import server from '../../axios/axiosConfig'
-import JSONResponse, { JSONResponseData } from './response'
+import JSONResponse from './response'
 
 
 
@@ -15,50 +17,43 @@ export default class RSTRequest {
 	makeup_trainer: string
 	makeup_uniform: MakeUpUniformType
 	makeup_remarks?: string
-	
+
 	constructor({
-					absence_dates,
-					absence_periods,
-					absence_type,
-					absence_reason,
-					makeup_dates,
-					makeup_location,
-					makeup_trainer,
-					makeup_uniform,
-					makeup_remarks
-				}: RSTForm) {
-		this.absence_dates = absence_dates
-		this.absence_periods = absence_periods
+		absence_dates,
+		absence_periods,
+		absence_type,
+		absence_reason,
+		makeup_dates,
+		makeup_location,
+		makeup_trainer,
+		makeup_uniform,
+		makeup_remarks
+	}: RSTForm) {
+		this.absence_dates = absence_dates as [Date, Date]
+		this.absence_periods = absence_periods as number
 		this.absence_type = absence_type as AbsenceTypeType
 		this.absence_reason = absence_reason
-		this.makeup_dates = makeup_dates
+		this.makeup_dates = makeup_dates as [Date, Date]
 		this.makeup_location = makeup_location
 		this.makeup_trainer = makeup_trainer
 		this.makeup_uniform = makeup_uniform as MakeUpUniformType
 		this.makeup_remarks = makeup_remarks
 	}
-	
-	submit(): JSONResponse {
-		const response: JSONResponse = new JSONResponse()
-		server.post('', this.doc())
-			.then(res => {
-				// const return_data: RSTRequestAPIReturnData = res.data
-				const data: JSONResponseData = { data: undefined, status: res.status, error: undefined }
-				response.set(data)
-			})
+
+	async submit(): Promise<JSONResponse> {
+		try {
+			const res = await server.post(import.meta.env.VITE_SERVER_DOMAIN + import.meta.env.VITE_SERVER_NEW_RST_REQUEST_ROUTE, this.doc())
+			return new JSONResponse({ data: undefined, status: res.status, error: undefined })
 			// eslint-disable-next-line
-			.catch((error: any) => {
-				const data: JSONResponseData = {
-					data: undefined,
-					status: error.status,
-					error: error.response.data.message
-				}
-				response.set(data)
+		} catch (error: any) {
+			return new JSONResponse({
+				data: undefined,
+				status: error.status,
+				error: error.response.data.message || 'Failed to Submit Request'
 			})
-		
-		return response
+		}
 	}
-	
+
 	doc() {
 		return {
 			absence_dates: this.absence_dates,

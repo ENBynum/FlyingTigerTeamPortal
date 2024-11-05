@@ -1,3 +1,4 @@
+import server from '../../axios/axiosConfig.ts'
 import JSONResponse from './response.ts'
 
 
@@ -25,26 +26,18 @@ export default class LoginRequest {
 		this.password = password
 	}
 
-	submit(): JSONResponse {
-		const response: JSONResponse = new JSONResponse()
-		// server.post('', this.doc())
-		// 	.then(res => {
-		// 		const return_data: LoginAPIResponseData = res.data
-		// 		const data: JSONResponseData = { data: return_data, status: res.status, error: undefined }
-		// 		response.set(data)
-		// 	})
-		// 	// eslint-disable-next-line
-		// 	.catch((error: any) => {
-		// 		const data: JSONResponseData = {
-		// 			data: undefined,
-		// 			status: error.status,
-		// 			error: error.response.data.message
-		// 		}
-		// 		response.set(data)
-		// 	})
-		response.set({ data: undefined, status: 300, error: this.email })
-
-		return response
+	async submit(): Promise<JSONResponse> {
+		try {
+			const res = await server.post(import.meta.env.VITE_SERVER_DOMAIN + import.meta.env.VITE_SERVER_SIGN_IN_ROUTE, this.doc())
+			return new JSONResponse({ data: res.data, status: res.status, error: undefined })
+			// eslint-disable-next-line
+		} catch (error: any) {
+			return new JSONResponse({
+				data: undefined,
+				status: error.status,
+				error: error.response.data.message || 'Failed to Authenticate'
+			})
+		}
 	}
 
 	doc(): LoginRequestData {

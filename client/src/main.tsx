@@ -1,16 +1,19 @@
-import { createTheme, MantineProvider } from '@mantine/core'
-import { Notifications } from '@mantine/notifications'
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { Provider } from 'react-redux'
 import '@mantine/core/styles.css'
 import '@mantine/dates/styles.css'
 import '@mantine/notifications/styles.css'
+
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import { Provider } from 'react-redux'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import RequestRSTRoute from './routes/__user-routes/request-rst'
-import HomeRoute from './routes/home'
-import RegisterRoute from './routes/register'
-import SignInRoute from './routes/sign-in'
+
+import { createTheme, MantineProvider } from '@mantine/core'
+import { Notifications } from '@mantine/notifications'
+
+import RequestRSTRoute from './routes/__user-routes/rst-request/rst-request-index'
+import HomeRoute from './routes/home/home-index'
+import RegisterRoute from './routes/register/register-index'
+import SignInRoute from './routes/sign-in/sign-in-index'
 import { store } from './store/main'
 
 

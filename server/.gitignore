@@ -1,0 +1,10 @@
+venv/
+.vscode/
+.idea/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+utils/raven_database/free.flying-tiger.client.certificate.pem
+*.env
+*.env.*
