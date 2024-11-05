@@ -18,13 +18,13 @@ class RSTRequest(BaseModel):
     makeup_uniform: Literal['ACU', 'PT', 'ASU']
     makeup_remarks: Optional[str] = None
     user_signature: Optional[str] = None
-    user_signature_date: Optional[datetime] = None
+    user_signature_date: Optional[str] = None
     supervisor_recommendation: Optional[Literal['Approved', 'Denied']] = None
     supervisor_signature: Optional[str] = None
-    supervisor_signature_date: Optional[datetime] = None
+    supervisor_signature_date: Optional[str] = None
     commander_decision: Optional[Literal['Approved', 'Denied']] = None
     commander_signature: Optional[str] = None
-    commander_signature_date: Optional[datetime] = None
+    commander_signature_date: Optional[str] = None
 
     def set_user_signature(self, profile: Profile):
         if not self.Id and not self.dodid:

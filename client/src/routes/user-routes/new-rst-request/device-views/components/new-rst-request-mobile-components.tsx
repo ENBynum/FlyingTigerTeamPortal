@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { Button, Grid, Group, Select, Stack, Text, Textarea, TextInput, Title } from '@mantine/core'
@@ -10,14 +11,14 @@ import {
 import {
 	AbsenceTypes, AbsenceTypeToolTips, MakeUpUniforms
 } from '../../../../../utils/variables/rst'
-import { useRSTFormContext } from '../../utils/rst-form'
-import { AbsenceTypeType } from '../../utils/types'
+import { useRSTFormContext } from '../../utils/new-rst-request-form'
+import { AbsenceTypeType } from '../../utils/new-rst-request-types'
 
 
 
-export function RSTAbsenceDate({ reference }) {
+export function RSTAbsenceDate({ reference }: { reference: any }): JSX.Element {
 	const form = useRSTFormContext()
-	
+
 	form.watch('absence_dates', ({ value }) => {
 		if (value[0] && value[1]) {
 			form.setFieldValue(
@@ -28,7 +29,7 @@ export function RSTAbsenceDate({ reference }) {
 			form.setFieldValue('absence_periods', undefined)
 		}
 	})
-	
+
 	return <>
 		<Stack ref={reference} justify={'center'} align={'center'} gap={'0.5rem'}>
 			<Title order={3}>Absence Dates</Title>
@@ -40,7 +41,7 @@ export function RSTAbsenceDate({ reference }) {
 				minDate={new Date()}
 				key={form.key('absence_dates')}
 				{...form.getInputProps('absence_dates')}
-				c={form.errors.absence_dates && 'red'}
+				c={form.errors.absence_dates ? 'red' : undefined}
 			/>
 			{form.errors.absence_dates && <Text w={'100%'} size={'sm'} c={'red'}>{form.errors.absence_dates}</Text>}
 			<Group w={'100%'}>
@@ -51,27 +52,19 @@ export function RSTAbsenceDate({ reference }) {
 	</>
 }
 
-function AbsenceType() {
+function AbsenceType(): JSX.Element {
 	const form = useRSTFormContext()
 	const rst = useSelector((state: RootState) => state.rst)
 	const dispatch = useDispatch<AppDispatch>()
-	
+
 	form.watch('absence_type', ({ value }) => {
 		AbsenceTypeToolTips.map((tooltip: { type: string, tooltips: string[] }) => {
 			if (tooltip.type === value) dispatch(setToolTip(tooltip.tooltips))
 		})
-		
+
 		dispatch(setAbsenceType(value as AbsenceTypeType))
-		
-		const earliest = Math.floor(form.getValues().absence_dates[0].valueOf() - (1000 * 60 * 60 * 24 * 60))
-		if (earliest < new Date().valueOf()) {
-			dispatch(setEarliestMakeUpDate(new Date()))
-		} else {
-			dispatch(setEarliestMakeUpDate(new Date(earliest)))
-		}
-		dispatch(setLatestMakeUpDate(new Date(Math.floor(form.getValues().absence_dates[1].valueOf() + (1000 * 60 * 60 * 24 * 60)))))
 	})
-	
+
 	return <>
 		<Stack w={'100%'} justify={'center'} align={'center'} gap={'0.5rem'}>
 			<Select
@@ -92,9 +85,9 @@ function AbsenceType() {
 	</>
 }
 
-function AbsenceReason() {
+function AbsenceReason(): JSX.Element {
 	const form = useRSTFormContext()
-	
+
 	return <>
 		<Textarea
 			id={'#rst-absence-reason'}
@@ -109,19 +102,32 @@ function AbsenceReason() {
 	</>
 }
 
-export function RSTAbsence() {
+export function RSTAbsence(): JSX.Element {
 	return <>
 		<Stack w={'100%'} justify={'center'} align={'center'} gap={'0.5rem'}>
-			<AbsenceType/>
-			<AbsenceReason/>
+			<AbsenceType />
+			<AbsenceReason />
 		</Stack>
 	</>
 }
 
-function MakeUpDate() {
+function MakeUpDate(): JSX.Element {
 	const form = useRSTFormContext()
 	const rst = useSelector((state: RootState) => state.rst)
-	
+	const dispatch = useDispatch<AppDispatch>()
+
+	useEffect(function (): void {
+		if (form.getValues().absence_dates) {
+			const absence_start: number | undefined = form.getValues().absence_dates[0]?.valueOf()
+			const absence_end: number | undefined = form.getValues().absence_dates[1]?.valueOf()
+			if (absence_start && absence_end) {
+				const earliest = Math.floor(absence_start - (1000 * 60 * 60 * 24 * 60)) < new Date().valueOf() ? new Date() : new Date(Math.floor(absence_start - (1000 * 60 * 60 * 24 * 60)))
+				dispatch(setEarliestMakeUpDate(earliest))
+				dispatch(setLatestMakeUpDate(new Date(Math.floor(absence_end + (1000 * 60 * 60 * 24 * 60)))))
+			}
+		}
+	}, [form.getValues().absence_dates, form.getValues().absence_type])
+
 	return <>
 		<DatePickerInput
 			id={'rst-makeup-dates'}
@@ -141,10 +147,10 @@ function MakeUpDate() {
 	</>
 }
 
-function MakeUpLocation() {
+function MakeUpLocation(): JSX.Element {
 	const form = useRSTFormContext()
 	const rst = useSelector((state: RootState) => state.rst)
-	
+
 	return <>
 		<TextInput
 			id={'rst-makeup-location'}
@@ -159,10 +165,10 @@ function MakeUpLocation() {
 	</>
 }
 
-function MakeUpTrainer() {
+function MakeUpTrainer(): JSX.Element {
 	const form = useRSTFormContext()
 	const rst = useSelector((state: RootState) => state.rst)
-	
+
 	return <>
 		<TextInput
 			id={'rst-makeup-trainer'}
@@ -177,10 +183,10 @@ function MakeUpTrainer() {
 	</>
 }
 
-function MakeUpUniform() {
+function MakeUpUniform(): JSX.Element {
 	const form = useRSTFormContext()
 	const rst = useSelector((state: RootState) => state.rst)
-	
+
 	return <>
 		<Select
 			id={'rst-makeup-uniform'}
@@ -196,10 +202,10 @@ function MakeUpUniform() {
 	</>
 }
 
-function MakeUpRemarks() {
+function MakeUpRemarks(): JSX.Element {
 	const form = useRSTFormContext()
 	const rst = useSelector((state: RootState) => state.rst)
-	
+
 	return <>
 		<Textarea
 			id={'rst-makeup-remarks'}
@@ -213,22 +219,22 @@ function MakeUpRemarks() {
 	</>
 }
 
-export function RSTMakeUp() {
+export function RSTMakeUp(): JSX.Element {
 	return <>
 		<Stack w={'100%'} justify={'center'} align={'center'} gap={'0.5rem'}>
-			<MakeUpDate/>
-			<MakeUpLocation/>
-			<MakeUpTrainer/>
-			<MakeUpUniform/>
-			<MakeUpRemarks/>
+			<MakeUpDate />
+			<MakeUpLocation />
+			<MakeUpTrainer />
+			<MakeUpUniform />
+			<MakeUpRemarks />
 		</Stack>
 	</>
 }
 
-export function FormButtons() {
+export function FormButtons(): JSX.Element {
 	return <>
 		<Grid w={'100%'}>
-			<Grid.Col span={1}/>
+			<Grid.Col span={1} />
 			<Grid.Col span={5}>
 				<Button w={'100%'} variant={'outline'} onClick={() => console.log('Cancel Request')}>
 					Cancel
@@ -239,7 +245,7 @@ export function FormButtons() {
 					Submit Request
 				</Button>
 			</Grid.Col>
-			<Grid.Col span={1}/>
+			<Grid.Col span={1} />
 		</Grid>
 	</>
 }

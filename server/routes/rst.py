@@ -1,3 +1,4 @@
+from datetime import UTC, datetime
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, status
 from models import (Credential, DecisionRequest, NewRSTRequest, Profile,
@@ -10,6 +11,19 @@ from utils.raven_database.databases import RSTDB, AuthDB
 load_dotenv()
 
 rst_router = APIRouter()
+
+@rst_router.get('/user/pending', status_code=status.HTTP_200_OK)
+def pending_rst_requests(dodid: str = Depends(authenticated)):
+    if not dodid:
+        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'message': 'Not Authenticated'})
+    
+    try:
+        with RSTDB.store().open_session() as rst_session:
+            rst_requests = list(rst_session.query(object_type=RSTRequest).where_equals('dodid', dodid).and_also().where_equals('commander_signature', None))
+            return JSONResponseWithTokens(dodid=dodid, content={'requests': [request for request in rst_requests if request.commander_signature is None and request.absence_dates[0].timestamp() <= datetime.now(UTC).timestamp()]})
+    except Exception as error:
+        return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={'message': error})
+            
 
 @rst_router.post('/new', status_code=status.HTTP_201_CREATED)
 def new_rst_request(req: NewRSTRequest, dodid: str = Depends(authenticated)):

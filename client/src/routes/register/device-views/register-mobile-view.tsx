@@ -2,7 +2,7 @@ import { Container, ScrollArea, Stack } from '@mantine/core'
 
 import {
 	Contact, DODIDInputs, Header, Password, PII, SignInLink, SubmitButton, Unit
-} from './components/mobile'
+} from './components/register-mobile-components'
 
 
 

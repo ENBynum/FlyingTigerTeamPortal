@@ -28,6 +28,7 @@ app.include_router(auth_router, prefix='/api/auth')
 app.include_router(rst_router, prefix='/api/rst-request')
 
 if __name__ == '__main__':
-    config = uvicorn.Config('main:app', host='10.0.0.252', port=5174, log_level='info', reload=True)
-    server = uvicorn.Server(config)
-    server.run()
+    # config = uvicorn.Config('main:app', host='10.0.0.252', port=5174, log_level='info', reload=True)
+    # server = uvicorn.Server(config)
+    # server.run()
+    uvicorn.run('main:app', host='10.0.0.252', port=5174, log_level='info', reload=True)

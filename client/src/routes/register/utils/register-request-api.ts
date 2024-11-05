@@ -1,6 +1,6 @@
-import { RegisterForm } from '../../../routes/register/utils/types'
-import server from '../../axios/axiosConfig'
-import JSONResponse from './response'
+import server from '../../../utils/axios/axiosConfig'
+import JSONResponse from '../../../utils/constructs/api/response'
+import { RegisterForm } from './register-form'
 
 
 
@@ -20,7 +20,7 @@ export default class RegisterRequest {
 	email: string
 	phone: string
 	password: string
-	
+
 	constructor({ dodid, rank, name, platoon, squad, email, phone, password }: RegisterForm) {
 		this.dodid = dodid
 		this.rank = rank
@@ -31,7 +31,7 @@ export default class RegisterRequest {
 		this.phone = phone
 		this.password = password
 	}
-	
+
 	/**
 	 * Submits the registration request to the server.
 	 *
@@ -56,7 +56,7 @@ export default class RegisterRequest {
 			})
 		}
 	}
-	
+
 	/**
 	 * Converts the RegisterRequest object to a JSON object.
 	 * @returns {object} An object containing the registration form data.

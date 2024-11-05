@@ -1,9 +1,7 @@
-import { RSTForm } from '../../../routes/__user-routes/request-rst/utils/rst-form'
-import {
-	AbsenceTypeType, MakeUpUniformType
-} from '../../../routes/__user-routes/request-rst/utils/types'
-import server from '../../axios/axiosConfig'
-import JSONResponse from './response'
+import server from '../../../../utils/axios/axiosConfig'
+import JSONResponse from '../../../../utils/constructs/api/response'
+import { RSTForm } from './new-rst-request-form'
+import { AbsenceTypeType, MakeUpUniformType } from './new-rst-request-types'
 
 
 

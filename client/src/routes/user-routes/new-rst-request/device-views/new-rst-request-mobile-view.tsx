@@ -4,22 +4,24 @@ import { useMobileOrientation } from 'react-device-detect'
 import { Container, Group, ScrollArea, Stack } from '@mantine/core'
 import { useElementSize } from '@mantine/hooks'
 
-import { FormButtons, RSTAbsence, RSTAbsenceDate, RSTMakeUp } from './components/mobile'
+import {
+	FormButtons, RSTAbsence, RSTAbsenceDate, RSTMakeUp
+} from './components/new-rst-request-mobile-components'
 
 
 
-export default function MobileView() {
+export default function MobileView(): JSX.Element {
 	const viewport: HTMLMetaElement | null = document.querySelector('meta[name="viewport"]')
 	if (viewport) {
 		viewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, allow-user-scalable=no'
 	}
 	const { isPortrait, isLandscape } = useMobileOrientation()
 	const { ref, width, height } = useElementSize()
-	
+
 	useEffect(() => {
 		console.log(width, height)
 	}, [height, width])
-	
+
 	return <>
 		{isPortrait && <Stack
 			w={'100%'}
@@ -31,13 +33,13 @@ export default function MobileView() {
 			px={'xs'}
 			pb={'1.5rem'}
 		>
-			<RSTAbsenceDate reference={ref}/>
-			<RSTAbsence/>
-			<RSTMakeUp/>
-			<FormButtons/>
+			<RSTAbsenceDate reference={ref} />
+			<RSTAbsence />
+			<RSTMakeUp />
+			<FormButtons />
 		</Stack>}
 		{isLandscape && <Group w={'100%'} gap={'1rem'} pt={0} px={'xs'} pb={'1.5rem'}>
-			<RSTAbsenceDate reference={ref}/>
+			<RSTAbsenceDate reference={ref} />
 			<Container
 				fluid
 				miw={`calc(100% - ${width}px - 1rem)`}
@@ -59,9 +61,9 @@ export default function MobileView() {
 						gap={'2rem'}
 						pb={'2rem'}
 					>
-						<RSTAbsence/>
-						<RSTMakeUp/>
-						<FormButtons/>
+						<RSTAbsence />
+						<RSTMakeUp />
+						<FormButtons />
 					</Stack>
 				</ScrollArea>
 			</Container>

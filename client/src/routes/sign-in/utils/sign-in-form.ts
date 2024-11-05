@@ -1,7 +1,10 @@
 import { createFormContext } from '@mantine/form'
 
-import { SignInForm } from './types.ts'
 
 
+export interface SignInForm {
+    email: string,
+    password: string
+}
 
 export const [SignInFormProvider, useSignInFormContext, useSignInForm] = createFormContext<SignInForm>()

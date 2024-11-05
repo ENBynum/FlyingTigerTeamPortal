@@ -1,6 +1,6 @@
 import { createFormContext } from '@mantine/form'
 
-import { AbsenceTypeType, MakeUpUniformType } from './types'
+import { AbsenceTypeType, MakeUpUniformType } from './new-rst-request-types'
 
 
 

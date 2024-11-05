@@ -6,12 +6,11 @@ import { TransformedValues } from '@mantine/form'
 import { useDocumentTitle, useWindowScroll } from '@mantine/hooks'
 import { notifications } from '@mantine/notifications'
 
-import RegisterRequest from '../../utils/constructs/api/register-request'
 import JSONResponse from '../../utils/constructs/api/response'
 import { RankType } from '../../utils/types/profile'
 import MobileView from './device-views/register-mobile-view'
-import { RegisterFormProvider, useRegisterForm } from './utils/register-form'
-import { RegisterForm } from './utils/types'
+import { RegisterForm, RegisterFormProvider, useRegisterForm } from './utils/register-form'
+import RegisterRequest from './utils/register-request-api'
 
 
 

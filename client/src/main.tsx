@@ -10,10 +10,10 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { createTheme, MantineProvider } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
 
-import RequestRSTRoute from './routes/__user-routes/rst-request/rst-request-index'
 import HomeRoute from './routes/home/home-index'
 import RegisterRoute from './routes/register/register-index'
 import SignInRoute from './routes/sign-in/sign-in-index'
+import RequestRSTRoute from './routes/user-routes/new-rst-request/new-rst-request-index'
 import { store } from './store/main'
 
 

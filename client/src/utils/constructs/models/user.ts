@@ -1,6 +1,6 @@
+import { SignInAPIResponseData } from '../../../routes/sign-in/utils/sign-in-request-api.ts'
 import server from '../../axios/axiosConfig.ts'
 import { RankType } from '../../types/profile.ts'
-import { LoginAPIResponseData } from '../api/login-request.ts'
 
 
 
@@ -34,7 +34,7 @@ export default class User {
 		this.role = undefined
 	}
 
-	login({ dodid, role, platoon, squad }: LoginAPIResponseData): void {
+	login({ dodid, role, platoon, squad }: SignInAPIResponseData): void {
 		this.dodid = dodid
 		this.role = role
 		this.platoon = platoon
@@ -43,7 +43,8 @@ export default class User {
 
 	login_redirect(): string {
 		if (this.role === 'User') {
-			return `/user/dashboard/${this.dodid}`
+			return '/request/rst/new'
+			// return `/user/dashboard/${this.dodid}`
 		} else {
 			return '/'
 		}

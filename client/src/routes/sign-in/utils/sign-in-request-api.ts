@@ -1,15 +1,15 @@
-import server from '../../axios/axiosConfig.ts'
-import JSONResponse from './response.ts'
+import server from '../../../utils/axios/axiosConfig'
+import JSONResponse from '../../../utils/constructs/api/response'
 
 
 
-export interface LoginRequestData {
+export interface SignInRequestData {
 	email: string
 	password: string
 }
 
 
-export interface LoginAPIResponseData {
+export interface SignInAPIResponseData {
 	dodid: string
 	role: 'User' | 'Acting Squad Leader' | 'Squad Leader' | 'Section Sergeant' | 'Platoon Sergeant' | 'Admin'
 	platoon: string
@@ -17,11 +17,11 @@ export interface LoginAPIResponseData {
 }
 
 
-export default class LoginRequest {
+export default class SignInRequest {
 	email: string
 	password: string
 
-	constructor({ email, password }: LoginRequestData) {
+	constructor({ email, password }: SignInRequestData) {
 		this.email = email
 		this.password = password
 	}
@@ -40,7 +40,7 @@ export default class LoginRequest {
 		}
 	}
 
-	doc(): LoginRequestData {
+	doc(): SignInRequestData {
 		return {
 			email: this.email,
 			password: this.password
