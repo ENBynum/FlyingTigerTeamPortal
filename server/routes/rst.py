@@ -20,7 +20,12 @@ def pending_rst_requests(dodid: str = Depends(authenticated)):
     try:
         with RSTDB.store().open_session() as rst_session:
             rst_requests = list(rst_session.query(object_type=RSTRequest).where_equals('dodid', dodid).and_also().where_equals('commander_signature', None))
-            return JSONResponseWithTokens(dodid=dodid, content={'requests': [request for request in rst_requests if request.commander_signature is None and request.absence_dates[0].timestamp() <= datetime.now(UTC).timestamp()]})
+            requests = []
+            for request in rst_requests:
+                if request.commander_signature is None and request.absence_dates[0].timestamp() >= datetime.now(UTC).timestamp():
+                    req = request.doc()
+                    requests.append(req)
+            return JSONResponseWithTokens(dodid=dodid, content={'requests': requests})
     except Exception as error:
         return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={'message': error})
             

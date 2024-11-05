@@ -1,17 +1,24 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-import { LoginAPIResponseData } from '../../utils/constructs/api/login-request.ts'
-import User from '../../utils/constructs/models/user.ts'
+import { SignInAPIResponseData } from '../../routes/sign-in/utils/sign-in-request-api.ts'
 
 
 
 export interface AuthState {
-	user?: User
+	dodid?: string
+	role?: string
+	platoon?: string
+	squad?: string
+	dashboard_route?: string
 }
 
 
 const initialState: AuthState = {
-	user: undefined
+	dodid: undefined,
+	role: undefined,
+	platoon: undefined,
+	squad: undefined,
+	dashboard_route: undefined
 }
 
 const AuthSlice = createSlice({
@@ -24,16 +31,26 @@ const AuthSlice = createSlice({
 		 * reflect the new user.
 		 * @param action - The login response data.
 		 */
-		login: function (state, action: PayloadAction<LoginAPIResponseData>): void {
-			state.user = new User()
-			state.user.login(action.payload)
+		login: function (state, action: PayloadAction<SignInAPIResponseData>): void {
+			state.dodid = action.payload.dodid
+			state.role = action.payload.role
+			state.platoon = action.payload.platoon
+			state.squad = action.payload.squad
+			if (action.payload.role === 'User') {
+				state.dashboard_route = `/dashboard/user/${action.payload.dodid}`
+			} else {
+				state.dashboard_route = '/sign-in'
+			}
 		},
 		/**
 		 * Logs out the user and resets the auth state back to its
 		 * initial state.
 		 */
 		logout: function (state): void {
-			state.user = undefined
+			state.dodid = undefined
+			state.role = undefined
+			state.platoon = undefined
+			state.squad = undefined
 		}
 	}
 })

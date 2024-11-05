@@ -1,13 +1,28 @@
 from dotenv import load_dotenv
 from fastapi import APIRouter, status
+from fastapi.params import Depends
 from models import Credential, Profile, RegisterRequest, SignInRequest
 from starlette.responses import JSONResponse
+from utils.middleware.authenticate import authenticated
 from utils.JSONResponseWithTokens import JSONResponseWithTokens
 from utils.raven_database.databases import AuthDB
 
 load_dotenv()
 
 auth_router = APIRouter()
+
+@auth_router.get('/', status_code=status.HTTP_200_OK)
+def authenticate(dodid: str = Depends(authenticated)):
+    if not dodid:
+        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'message': 'Not Authenticated'})
+
+    try:
+        with AuthDB.store().open_session() as auth_session:
+            user_credentials = auth_session.load(key_or_keys=f'Credentials/{dodid}', object_type=Credential)
+            user_profile = auth_session.load(key_or_keys=f'Profiles/{dodid}', object_type=Profile)
+            return JSONResponseWithTokens(dodid, content={'dodid': user_credentials.dodid, 'role': user_credentials.role, 'platoon': user_profile.platoon, 'squad': user_profile.squad})
+    except Exception as error:
+        return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={'message': error})
 
 @auth_router.post('/user', status_code=status.HTTP_201_CREATED)
 def register(req: RegisterRequest):

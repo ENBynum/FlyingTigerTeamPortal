@@ -43,8 +43,8 @@ export default class User {
 
 	login_redirect(): string {
 		if (this.role === 'User') {
-			return '/request/rst/new'
-			// return `/user/dashboard/${this.dodid}`
+			// return '/request/rst/new'
+			return `/dashboard/user/${this.dodid}`
 		} else {
 			return '/'
 		}

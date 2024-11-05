@@ -1,6 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-import { AbsenceTypeType } from '../../routes/__user-routes/request-rst/utils/types'
+import {
+	AbsenceTypeType
+} from '../../routes/user-routes/new-rst-request/utils/new-rst-request-types'
 
 
 

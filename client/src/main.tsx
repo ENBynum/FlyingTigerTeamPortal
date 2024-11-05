@@ -14,7 +14,9 @@ import HomeRoute from './routes/home/home-index'
 import RegisterRoute from './routes/register/register-index'
 import SignInRoute from './routes/sign-in/sign-in-index'
 import RequestRSTRoute from './routes/user-routes/new-rst-request/new-rst-request-index'
+import UserDashboardRoute from './routes/user-routes/user-dashboard/user-dashboard-index'
 import { store } from './store/main'
+import ProtectedRoute from './utils/components/protected-route'
 
 
 
@@ -36,7 +38,8 @@ const router = createBrowserRouter([
 	{ path: '/sign-in', element: <SignInRoute/> },
 	{ path: '/register', element: <RegisterRoute/> },
 	// Protected Routes - User
-	{ path: '/request/rst/new', element: <RequestRSTRoute/> }
+	{ path: '/dashboard/user/:dodid', element: <ProtectedRoute><UserDashboardRoute /></ProtectedRoute> },
+	{ path: '/request/rst/new', element: <ProtectedRoute><RequestRSTRoute /></ProtectedRoute> }
 ])
 
 createRoot(document.getElementById('root')!).render(<StrictMode>

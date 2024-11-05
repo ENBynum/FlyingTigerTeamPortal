@@ -1,14 +1,14 @@
 export interface JSONResponseData {
-	data?: object
+	data?: any
 	status: number
 	error?: string
 }
 
 
 export default class JSONResponse {
-	data: object | undefined
+	data?: any
 	status: number
-	error: string | undefined
+	error?: string
 	
 	/**
 	 * Initializes a new instance of the JSONResponse class.
