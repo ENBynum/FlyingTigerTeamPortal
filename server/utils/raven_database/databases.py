@@ -22,12 +22,12 @@ class AuthDB:
 
         return cls._store
     
-class RSTDB:
+class PortalDB:
     _store: DocumentStore = None
 
     @staticmethod
     def _create_document_store() -> DocumentStore:
-        document_store = DocumentStore([os.getenv('RAVENDB_SERVER_URL')], 'RST')
+        document_store = DocumentStore([os.getenv('RAVENDB_SERVER_URL')], 'Portal')
         document_store.certificate_pem_path = os.getenv('RAVENDB_SERVER_CERT')
         document_store.initialize()
         return document_store

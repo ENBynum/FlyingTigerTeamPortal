@@ -18,6 +18,7 @@ export interface RegisterForm {
     no_middle?: boolean
     email: string
     phone: string
+    company: string
     platoon: string
     squad: string
     password: string

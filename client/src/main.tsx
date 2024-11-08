@@ -11,7 +11,7 @@ import { createTheme, MantineProvider } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
 
 import HomeRoute from './routes/home/home-index'
-import RegisterRoute from './routes/register/register-index'
+import RegisterRoute from './routes/register'
 import SignInRoute from './routes/sign-in/sign-in-index'
 import RequestRSTRoute from './routes/user-routes/new-rst-request/new-rst-request-index'
 import UserDashboardRoute from './routes/user-routes/user-dashboard/user-dashboard-index'

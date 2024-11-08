@@ -32,7 +32,7 @@ export default function ProtectedRoute({ children }: Props): JSX.Element {
     const navigate = useNavigate()
 
     useEffect((): void => {
-        if (!auth.dodid || !auth.role || !auth.platoon || !auth.squad) {
+        if (!auth.dodid || !auth.unit_level) {
             authenticate().then((res: JSONResponse): void => {
                 if (res.error) {
                     notifications.show({

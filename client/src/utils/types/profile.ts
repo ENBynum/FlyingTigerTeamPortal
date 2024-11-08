@@ -1,5 +1,8 @@
 export interface Name {
 	full?: string
+	last?: string
+	first?: string
+	middle?: string
 }
 
 

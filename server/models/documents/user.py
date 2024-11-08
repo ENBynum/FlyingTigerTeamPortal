@@ -1,5 +1,5 @@
 import os
-from typing import Optional
+from typing import Literal, Optional
 
 import bcrypt
 from dotenv import load_dotenv
@@ -24,13 +24,16 @@ class Name(BaseModel):
 class Credential(BaseModel):
     Id: Optional[str] = None
     dodid: str
-    role: str
+    role: Literal['OIC', 'Officer', 'NCOIC', 'NCO', 'Soldier']
+    admin: bool
+    profile: str
     email: str
     password: str
     attempts: int = 0
     enabled: bool = False
 
     def model_post_init(self, __context):
+        print(self.Id)
         if self.Id is None:
             self.Id = f'Credentials/{self.dodid}'
         return super().model_post_init(__context)
@@ -45,12 +48,11 @@ class Profile(BaseModel):
     name: Name
     email: str
     phone: str
-    platoon: str
-    squad: str
+    unit_level: Literal['Company', 'Platoon', 'Squad', 'Soldier']
+    unit: str
+    subunit: str
 
     def model_post_init(self, __context):
         if self.Id is None:
             self.Id = f'Profiles/{self.dodid}'
-        # if isinstance(self.name, Name):
-        #     self.name = self.name.model_dump_json()
         return super().model_post_init(__context)

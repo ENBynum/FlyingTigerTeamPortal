@@ -4,6 +4,7 @@ import { Stack } from '@mantine/core'
 
 import { RootState } from '../../../../store/main'
 import { UserDashboardState } from '../../../../store/slices/user-dashboard'
+import { UserDashboardNextBattleAssembly } from './components/user-dashboard-mobile-components'
 
 
 
@@ -17,10 +18,7 @@ export default function UserDashboardMobileView(): JSX.Element {
 
     return <>
         <Stack w={'100%'} mih={'100%'} justify={'start'} align={'center'} gap={'1.5rem'} pt={0} px={'xs'} pb={'1.5rem'}>
-            {dashboard.pending_rst_requests.map(req => (
-                <h1>{req}</h1>
-            ))}
-            <div>{dashboard.pending_rst_request_count}</div>
+            <UserDashboardNextBattleAssembly />
         </Stack>
     </>
 }

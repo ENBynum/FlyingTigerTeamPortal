@@ -55,9 +55,12 @@ export default function SignInRoute(): JSX.Element {
 			})
 			const data: SignInAPIResponseData = res.data as SignInAPIResponseData
 			dispatch(login(data))
-			navigate(auth.user?.login_redirect() as string)
 		}
 	}
+
+	useEffect(function (): void {
+		navigate(auth.dashboard_route as string)
+	}, [auth.dashboard_route])
 
 	return <>
 		<form onSubmit={form.onSubmit(handleSubmit)} style={{ width: '100%' }}>

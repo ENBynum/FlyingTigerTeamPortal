@@ -7,17 +7,6 @@ import { LogoComponent, RedirectButtons } from './components/home-mobile-compone
 
 
 
-/**
- * The mobile view for the home route.
- *
- * This route renders a logo and a sign-in/register button
- * within a Mantine Stack or Group component, depending on
- * the device orientation. On portrait devices, the components
- * are stacked vertically, and on landscape devices, they are
- * placed side-by-side.
- *
- * @returns The mobile view component.
- */
 export default function HomeMobileView(): JSX.Element {
 	useDocumentTitle('Home - Flying Tigers Team Portal')
 	const viewport: HTMLMetaElement | null = document.querySelector('meta[name="viewport"]')

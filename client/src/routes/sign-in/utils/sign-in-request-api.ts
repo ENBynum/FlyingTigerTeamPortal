@@ -11,9 +11,7 @@ export interface SignInRequestData {
 
 export interface SignInAPIResponseData {
 	dodid: string
-	role: 'User' | 'Acting Squad Leader' | 'Squad Leader' | 'Section Sergeant' | 'Platoon Sergeant' | 'Admin'
-	platoon: string
-	squad: string
+	unit_level: 'Soldier' | 'Squad' | 'Platoon' | 'Company'
 }
 
 
@@ -32,10 +30,11 @@ export default class SignInRequest {
 			return new JSONResponse({ data: res.data, status: res.status, error: undefined })
 			// eslint-disable-next-line
 		} catch (error: any) {
+			console.log(error)
 			return new JSONResponse({
 				data: undefined,
 				status: error.status,
-				error: error.response.data.message || 'Failed to Authenticate'
+				error: error || 'Failed to Authenticate'
 			})
 		}
 	}

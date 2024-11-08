@@ -1,13 +1,17 @@
 from datetime import UTC, datetime
 from typing import Literal, Optional
 
-from models.documents.user import Profile
+from models.documents.user import Credential, Profile
 from pydantic import BaseModel
+from models.documents.unit import CompanyUnit, PlatoonUnit
+from utils.raven_database.databases import AuthDB, PortalDB
 
 
 class RSTRequest(BaseModel):
     Id: Optional[str] = None
     dodid: Optional[str] = None
+    unit: Optional[str] = None
+    subunit: Optional[str] = None
     absence_dates: list[datetime, datetime]
     absence_periods: int
     absence_type: Literal['Excused/Absence Authorized', 'Excused/RST Authorized', 'Excused/ET Authorized', 'Exception of Unexcused Absence']
@@ -49,32 +53,85 @@ class RSTRequest(BaseModel):
             'commander_signature_date': self.commander_signature_date
         }
 
-    def set_user_signature(self, profile: Profile):
-        if not self.Id and not self.dodid:
-            self.Id = f'RSTRequests/{profile.dodid}.{self.absence_dates[0].strftime('%m%d%Y')}.{self.absence_dates[1].strftime('%m%d%Y')}'
-            self.dodid = profile.dodid
+    def set_user_signature(self, dodid: str) -> bool:
+        with PortalDB().store().open_session() as portal_session:
+            profile = portal_session.load(f'Profiles/{dodid}', Profile)
+            if profile is None:
+                return False
+            
+            if self.Id is None:
+                self.Id = f'RSTRequests/{profile.dodid}.{self.absence_dates[0].strftime('%m%d%Y')}.{self.absence_dates[1].strftime('%m%d%Y')}'
+            if self.dodid is None:
+                self.dodid = dodid
+            
+            self.unit = profile.unit
+            company = portal_session.load(profile.unit, CompanyUnit)
+            for platoonID in company.platoons:
+                if platoonID == profile.subunit:
+                    self.subunit = profile.subunit
+                else:
+                    platoon = portal_session.load(platoonID, PlatoonUnit)
+                    for squadID in platoon.squads:
+                        if squadID == profile.subunit:
+                            self.subunit = platoonID
+            
+            now = datetime.now(UTC)
+            if profile.name.middle is not None and profile.name.middle != '':
+                self.user_signature = 'Digitally Signed: ' + f'{profile.dodid}.{profile.name.first}.{profile.name.middle[0]}.{profile.name.last}.{now.timestamp()}'.upper()
+            else:
+                self.user_signature = 'Digitally Signed: ' + f'{profile.dodid}.{profile.name.first}.{profile.name.last}.{now.timestamp()}'.upper()
+            self.user_signature_date = now.strftime('%m/%d/%Y')
+            
+            return True
 
-        now = datetime.now(UTC)
-        if profile.name.middle is not None and profile.name.middle != '':
-            self.user_signature = 'Digitally Signed: ' + f'{profile.dodid}.{profile.name.first}.{profile.name.middle[0]}.{profile.name.last}.{now.timestamp()}'.upper()
-        else:
-            self.user_signature = 'Digitally Signed: ' + f'{profile.dodid}.{profile.name.first}.{profile.name.last}.{now.timestamp()}'.upper()
-        self.user_signature_date = now.strftime('%m/%d/%Y')
+    def set_supervisor_signature(self, recommendation: Literal['Approved', 'Denied'], dodid: str) -> bool:
+        with AuthDB().store().open_session() as auth_sesson:
+            credentials = auth_sesson.load(f'Credentials/{dodid}', Credential)
+            if credentials is None:
+                return False
+            if credentials.role not in ['NCOIC', 'OIC'] and not credentials.admin:
+                return False
 
-    def set_supervisor_signature(self, recommendation: Literal['Approved', 'Denied'], profile: Profile):
-        self.supervisor_recommendation = recommendation
-        now = datetime.now(UTC).timestamp()
-        if profile.name.middle is not None and profile.name.middle != '':
-            self.supervisor_signature = 'Digitally Signed: ' + f'{profile.dodid}.{profile.name.first}.{profile.name.middle[0]}.{profile.name.last}.{now.timestamp()}'.upper()
-        else:
-            self.supervisor_signature = 'Digitally Signed: ' + f'{profile.dodid}.{profile.name.first}.{profile.name.last}.{now.timestamp()}'.upper()
-        self.supervisor_signature_date = now.strftime('%m/%d/%Y')
+            with PortalDB().store().open_session() as portal_session:
+                profile = portal_session.load(f'Profiles/{dodid}', Profile)
+                if profile is None:
+                    return False
+                if profile.subunit != self.subunit or profile.unit_level not in ['Company', 'Platoon']:
+                    if not credentials.admin:
+                        return False
+                
+                self.supervisor_recommendation = recommendation
 
-    def set_commander_signature(self, decision: Literal['Approved', 'Denied'], profile: Profile):
-        self.commander_decision = decision
-        now = datetime.now(UTC).timestamp()
-        if profile.name.middle is not None and profile.name.middle != '':
-            self.commander_signature = 'Digitally Signed: ' + f'{profile.dodid}.{profile.name.first}.{profile.name.middle[0]}.{profile.name.last}.{now.timestamp()}'.upper()
-        else:
-            self.commander_signature = 'Digitally Signed: ' + f'{profile.dodid}.{profile.name.first}.{profile.name.last}.{now.timestamp()}'.upper()
-        self.commander_signature_date = now.strftime('%m/%d/%Y')
+                now = datetime.now(UTC).timestamp()
+                if profile.name.middle is not None and profile.name.middle != '':
+                    self.supervisor_signature = 'Digitally Signed: ' + f'{profile.dodid}.{profile.name.first}.{profile.name.middle[0]}.{profile.name.last}.{now.timestamp()}'.upper()
+                else:
+                    self.supervisor_signature = 'Digitally Signed: ' + f'{profile.dodid}.{profile.name.first}.{profile.name.last}.{now.timestamp()}'.upper()
+                self.supervisor_signature_date = now.strftime('%m/%d/%Y')
+                return True
+
+    def set_commander_signature(self, decision: Literal['Approved', 'Denied'], dodid: str) -> bool:
+        with AuthDB().store().open_session() as auth_sesson:
+            credentials = auth_sesson.load(f'Credentials/{dodid}', Credential)
+            if credentials is None:
+                return False
+            if credentials.role not in ['NCOIC', 'OIC'] and not credentials.admin:
+                return False
+            
+            with PortalDB().store().open_session() as portal_session:
+                profile = portal_session.load(f'Profiles/{dodid}', Profile)
+                if profile is None:
+                    return False
+                if profile.unit != self.unit or profile.unit_level != 'Company':
+                    if not credentials.admin:
+                        return False
+            
+                self.commander_decision = decision
+
+                now = datetime.now(UTC).timestamp()
+                if profile.name.middle is not None and profile.name.middle != '':
+                    self.commander_signature = 'Digitally Signed: ' + f'{profile.dodid}.{profile.name.first}.{profile.name.middle[0]}.{profile.name.last}.{now.timestamp()}'.upper()
+                else:
+                    self.commander_signature = 'Digitally Signed: ' + f'{profile.dodid}.{profile.name.first}.{profile.name.last}.{now.timestamp()}'.upper()
+                self.commander_signature_date = now.strftime('%m/%d/%Y')
+                return True

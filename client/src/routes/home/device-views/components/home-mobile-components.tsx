@@ -5,14 +5,6 @@ import { AspectRatio, Button, Center, Image, Paper, Stack } from '@mantine/core'
 
 
 
-/**
- * Renders a logo component that adjusts its dimensions based on device orientation.
- *
- * The component utilizes Mantine's Paper, Center, Image, and AspectRatio components
- * to display an image of a seal. The dimensions of the component adapt to the device
- * orientation: full width and half height in portrait mode, and half width and full
- * height in landscape mode.
- */
 export function LogoComponent(): JSX.Element {
 	const { isPortrait } = useMobileOrientation()
 
@@ -34,15 +26,6 @@ export function LogoComponent(): JSX.Element {
 	</>
 }
 
-/**
- * Renders a sign-in button for the home route.
- *
- * This component uses Mantine's Button component to create a large,
- * center-aligned button. The button is styled with a width of 90%
- * and is used to navigate to the sign-in route when clicked.
- *
- * @returns The sign-in button component.
- */
 function SignInButton(): JSX.Element {
 	const navigate = useNavigate()
 
@@ -53,15 +36,6 @@ function SignInButton(): JSX.Element {
 	</>
 }
 
-/**
- * Renders a register button for the home route.
- *
- * This component uses Mantine's Button component to create a large,
- * center-aligned button. The button is styled with a width of 90%
- * and is used to navigate to the register route when clicked.
- *
- * @returns The register button component.
- */
 function RegisterButton(): JSX.Element {
 	const navigate = useNavigate()
 
@@ -72,16 +46,6 @@ function RegisterButton(): JSX.Element {
 	</>
 }
 
-/**
- * Renders a stack of the sign-in and register buttons for the home route.
- *
- * This component uses Mantine's Stack component to display the sign-in and
- * register buttons in a responsive manner. On portrait devices, the buttons
- * are stacked vertically, and on landscape devices, they are placed
- * side-by-side.
- *
- * @returns The redirect buttons component.
- */
 export function RedirectButtons(): JSX.Element {
 	const { isPortrait } = useMobileOrientation()
 
