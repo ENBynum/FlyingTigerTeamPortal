@@ -1,10 +1,10 @@
 import { Stack } from '@mantine/core'
 
-import { UserDashboardNextBattleAssembly } from './components/user-dashboard-mobile-components'
+import { UpcomingTraining } from '../components/metric-cards/mobile'
 
 
 
-export default function UserDashboardMobileView(): JSX.Element {
+export default function MobileLayout(): JSX.Element {
     const viewport: HTMLMetaElement | null = document.querySelector('meta[name="viewport"]')
     if (viewport) {
         viewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, allow-user-scalable=no'
@@ -12,7 +12,7 @@ export default function UserDashboardMobileView(): JSX.Element {
 
     return <>
         <Stack w={'100%'} mih={'100%'} justify={'start'} align={'center'} gap={'1.5rem'} pt={0} px={'xs'} pb={'1.5rem'}>
-            <UserDashboardNextBattleAssembly />
+            <UpcomingTraining />
         </Stack>
     </>
 }

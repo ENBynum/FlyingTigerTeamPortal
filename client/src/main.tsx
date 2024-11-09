@@ -13,8 +13,8 @@ import { Notifications } from '@mantine/notifications'
 import HomeRoute from './routes/home/home-index'
 import RegisterRoute from './routes/register'
 import SignInRoute from './routes/sign-in/sign-in-index'
+import SoldierDashboardRoute from './routes/soldier.dashbaord'
 import RequestRSTRoute from './routes/user-routes/new-rst-request/new-rst-request-index'
-import UserDashboardRoute from './routes/user-routes/user-dashboard/user-dashboard-index'
 import { store } from './store/main'
 import ProtectedRoute from './utils/components/protected-route'
 
@@ -38,8 +38,8 @@ const router = createBrowserRouter([
 	{ path: '/sign-in', element: <SignInRoute/> },
 	{ path: '/register', element: <RegisterRoute/> },
 	// Protected Routes - User
-	{ path: '/dashboard/user/:dodid', element: <ProtectedRoute><UserDashboardRoute /></ProtectedRoute> },
-	{ path: '/request/rst/new', element: <ProtectedRoute><RequestRSTRoute /></ProtectedRoute> }
+	{ path: '/dashboard/user/:dodid', element: <SoldierDashboardRoute /> },
+	{ path: '/request/rst/new', element: <ProtectedRoute unit_level={'Soldier'}><RequestRSTRoute /></ProtectedRoute> }
 ])
 
 createRoot(document.getElementById('root')!).render(<StrictMode>

@@ -1,9 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit'
 
 import { RegisterReducer } from '../routes/register/utils/register-slice'
+import { UserDashboardReducer } from '../routes/soldier.dashbaord/utils/soldier.dashboard.slice'
 import { AuthReducer } from './slices/auth'
 import { RSTReducer } from './slices/rst'
-import { UserDashboardReducer } from './slices/user-dashboard'
 
 
 

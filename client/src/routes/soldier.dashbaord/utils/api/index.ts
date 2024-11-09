@@ -1,0 +1,1 @@
+export { default as FetchTraining } from './fetch-trainng'

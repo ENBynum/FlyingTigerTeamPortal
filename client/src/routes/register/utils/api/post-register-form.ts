@@ -31,14 +31,11 @@ export default class RegisterRequest {
     async submit(): Promise<JSONResponse> {
         try {
             const res = await server.post(import.meta.env.VITE_SERVER_DOMAIN + import.meta.env.VITE_SERVER_REGISTER_ROUTE, this.doc())
-            return new JSONResponse({ data: undefined, status: res.status, error: undefined })
+            return new JSONResponse({ status: res.status })
             // eslint-disable-next-line
         } catch (error: any) {
-            return new JSONResponse({
-                data: undefined,
-                status: error.status,
-                error: error.response.data.message || 'Failed to Create Account'
-            })
+            console.log(error)
+            return new JSONResponse({ status: error.status, error: error.message || 'Failed to Create Account' })
         }
     }
 
