@@ -21,7 +21,7 @@ def pending_rst_requests(dodid: str = Depends(authenticated)):
             rst_requests = list(portal_session.query(object_type=RSTRequest).where_equals('dodid', dodid).and_also().where_equals('commander_signature', None))
             requests = []
             for request in rst_requests:
-                if request.absence_dates[0].strptime('%Y-%m-%d').timestamp() >= datetime.now(UTC).timestamp():
+                if request.absence_dates[0].timestamp() >= datetime.now(UTC).timestamp():
                     requests.append(request.doc())
             return JSONResponseWithTokens(dodid=dodid, content={'requests': requests})
     except Exception as error:
@@ -64,6 +64,8 @@ def new_rst_request(req: RSTRequest, dodid: str = Depends(authenticated)):
     if not dodid:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, 'Not Authenticated')
     
+    print(req)
+
     if not req.set_soldier_signature(dodid):
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, 'Not Authorized')
     

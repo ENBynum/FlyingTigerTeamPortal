@@ -12,11 +12,11 @@ class RSTRequest(BaseModel):
     dodid: Optional[str] = None
     unit: Optional[str] = None
     subunit: Optional[str] = None
-    absence_dates: list[datetime|str, datetime|str]
+    absence_dates: list[datetime, datetime]
     absence_periods: int
     absence_type: Literal['Excused/Absence Authorized', 'Excused/RST Authorized', 'Excused/ET Authorized', 'Exception of Unexcused Absence']
     absence_reason: str
-    makeup_dates: list[datetime|str, datetime|str]
+    makeup_dates: list[datetime, datetime]
     makeup_location: str
     makeup_trainer: str
     makeup_uniform: Literal['ACU', 'PT', 'ASU']
@@ -29,8 +29,8 @@ class RSTRequest(BaseModel):
     commander_decision: Optional[Literal['Approved', 'Denied']] = None
     commander_signature: Optional[str] = None
     commander_signature_date: Optional[str] = None
-
-    def save_doc(self):
+    
+    def doc(self):
         return {
             'Id': self.Id,
             'dodid': self.dodid,
@@ -39,29 +39,6 @@ class RSTRequest(BaseModel):
             'absence_type': self.absence_type,
             'absence_reason': self.absence_reason,
             'makeup_dates': [self.makeup_dates[0].strftime('%Y-%m-%d'), self.makeup_dates[1].strftime('%Y-%m-%d')],
-            'makeup_location': self.makeup_location,
-            'makeup_trainer': self.makeup_trainer,
-            'makeup_uniform': self.makeup_uniform,
-            'makeup_remarks': self.makeup_remarks,
-            'soldier_signature': self.soldier_signature,
-            'soldier_signature_date': self.soldier_signature_date,
-            'supervisor_recommendation': self.supervisor_recommendation,
-            'supervisor_signature': self.supervisor_signature,
-            'supervisor_signature_date': self.supervisor_signature_date,
-            'commander_decision': self.commander_decision,
-            'commander_signature': self.commander_signature,
-            'commander_signature_date': self.commander_signature_date
-        }
-    
-    def doc(self):
-        return {
-            'Id': self.Id,
-            'dodid': self.dodid,
-            'absence_dates': [self.absence_dates[0], self.absence_dates[1]],
-            'absence_periods': self.absence_periods,
-            'absence_type': self.absence_type,
-            'absence_reason': self.absence_reason,
-            'makeup_dates': [self.makeup_dates[0], self.makeup_dates[1]],
             'makeup_location': self.makeup_location,
             'makeup_trainer': self.makeup_trainer,
             'makeup_uniform': self.makeup_uniform,
