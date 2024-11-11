@@ -56,3 +56,16 @@ class Profile(BaseModel):
         if self.Id is None:
             self.Id = f'Profiles/{self.dodid}'
         return super().model_post_init(__context)
+    
+    def doc(self) -> dict:
+        return {
+            'Id': self.Id,
+            'dodid': self.dodid,
+            'rank': self.rank.upper(),
+            'name': self.name.to_doc(),
+            'email': self.email.lower(),
+            'phone': self.phone,
+            'unit_level': self.unit_level,
+            'unit': self.unit,
+            'subunit': self.subunit
+        }

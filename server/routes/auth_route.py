@@ -1,27 +1,44 @@
+from typing import Literal
+
 from dotenv import load_dotenv
-from fastapi import APIRouter, status
+from fastapi import APIRouter, HTTPException, status
 from fastapi.params import Depends
 from models import Credential, Profile, RegisterRequest, SignInRequest
+from models.documents.user import Name
+from pydantic import BaseModel
 from starlette.responses import JSONResponse
-from utils.middleware.authenticate import authenticated
 from utils.JSONResponseWithTokens import JSONResponseWithTokens
+from utils.middleware.authenticate import authenticated
 from utils.raven_database.databases import AuthDB, PortalDB
 
 load_dotenv()
 
-auth_router = APIRouter()
+auth_router = APIRouter(prefix='/api/auth', tags=['auth'])
+
+class ClientAuth(BaseModel):
+    dodid: str
+    rank: str
+    name: Name
+    email: str
+    phone: str
+    unit_level: Literal['Company', 'Platoon', 'Squad', 'Soldier']
+    unit: str
+    subunit: str
+
+    def __repr__(self):
+        return {'dodid': self.dodid, 'unit_level': self.unit_level}
 
 @auth_router.get('/', status_code=status.HTTP_200_OK)
 def authenticate(dodid: str = Depends(authenticated)):
-    if not dodid:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'message': 'Not Authenticated'})
+    if dodid is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not Authenticated")
 
-    try:
-        with PortalDB.store().open_session() as portal_session:
-            user_profile = portal_session.load(key_or_keys=f'Profiles/{dodid}', object_type=Profile)
-            return JSONResponseWithTokens(dodid, content={'dodid': user_profile.dodid, 'unit_level': user_profile.unit_level})
-    except Exception as error:
-        return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={'message': error})
+    with PortalDB().store().open_session() as portal_session:
+        profile = portal_session.load(f'Profiles/{dodid}', Profile)
+        if profile is None:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not Authenticated")
+        
+        return ClientAuth(**profile.doc())
 
 @auth_router.post('/user', status_code=status.HTTP_201_CREATED)
 def register(req: RegisterRequest):
@@ -50,31 +67,31 @@ def register(req: RegisterRequest):
 
 @auth_router.post('/sign-in', status_code=status.HTTP_200_OK)
 def sign_in(req: SignInRequest):
-    try:
-        with AuthDB.store().open_session() as auth_session:
-            if auth_session.query_collection(collection_name='Credentials', object_type=Credential).where_equals('email', req.email).count() == 0:
-                return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'message': 'Invalid Credentials'})
-            
-            credentials = auth_session.query_collection(collection_name='Credentials', object_type=Credential).where_equals('email', req.email).first()
-            if not credentials.check_password(req.password):
-                credentials.attempts += 1
-                if credentials.attempts >= 3:
-                    credentials.enabled = False
-                    auth_session.save_changes()
-                    return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'message': 'Sign In Attempts Exceeded'})
-                auth_session.save_changes()
-                return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'message': 'Invalid Credentials'})
-            
-            if not credentials.enabled:
-                return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'message': 'Account Disabled'})
+    with AuthDB.store().open_session() as auth_session:
+        credentials = list(auth_session.query_collection(collection_name='Credentials', object_type=Credential).where_equals('email', req.email))
+        if len(credentials) == 0:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid Credentials')
+        if auth_session.query_collection(collection_name='Credentials', object_type=Credential).where_equals('email', req.email).count() == 0:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid Credentials')
+        
+        credentials = auth_session.query_collection(collection_name='Credentials', object_type=Credential).where_equals('email', req.email).first()
+        if not credentials.check_password(req.password):
+            credentials.attempts += 1
             if credentials.attempts >= 3:
-                return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'message': 'Sign In Attempts Exceeded'})
-
-            credentials.attempts = 0
+                credentials.enabled = False
+                auth_session.save_changes()
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Sign In Attempts Exceeded')
             auth_session.save_changes()
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid Credentials')
+        
+        if not credentials.enabled:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Account Disabled')
+        if credentials.attempts >= 3:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Sign In Attempts Exceeded')
 
-            with PortalDB.store().open_session() as portal_session:
-                profile = portal_session.load(credentials.profile, Profile)
-                return JSONResponseWithTokens(dodid=profile.dodid, content={'dodid': profile.dodid, 'unit_level': profile.unit_level})
-    except Exception as error:
-        return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={'message': error})
+        credentials.attempts = 0
+        auth_session.save_changes()
+
+        with PortalDB.store().open_session() as portal_session:
+            profile = portal_session.load(credentials.profile, Profile)
+            return JSONResponseWithTokens(dodid=profile.dodid, content={'dodid': profile.dodid, 'unit_level': profile.unit_level})

@@ -8,7 +8,7 @@ class RefreshToken(BaseModel):
     Id: Optional[str] = None
     dodid: str
     token: str
-    expires: datetime
+    expires: int|float
  
     def model_post_init(self, __context):
         if not self.Id:
@@ -19,7 +19,7 @@ class BlacklistToken(BaseModel):
     Id: Optional[str] = None
     dodid: str
     token: str
-    expires: datetime
+    expires: int|float
 
     def model_post_init(self, __context):
         if not self.Id:

@@ -11,14 +11,14 @@ class Drill(BaseModel):
 
     def model_post_init(self, __context):
         if self.Id is None:
-            self.Id = f'Drills/{self.start_date.strftime('%m/%d/%Y')}.{self.end_date.strftime('%m/%d/%Y')}'
+            self.Id = f'Drills/{self.start_date.strftime('%Y-%m-%d')}.{self.end_date.strftime('%Y-%m-%d')}'
         return super().model_post_init(__context)
 
     def doc(self):
         return {
             'Id': self.Id,
-            'start_date': self.start_date.strftime('%m/%d/%Y'), 
-            'end_date': self.end_date.strftime('%m/%d/%Y')
+            'start_date': self.start_date.strftime('%Y-%m-%d'), 
+            'end_date': self.end_date.strftime('%Y-%m-%d')
         }
     
 class ET(BaseModel):
@@ -28,14 +28,14 @@ class ET(BaseModel):
 
     def model_post_init(self, __context):
         if self.Id is None:
-            self.Id = f'ETs/{self.start_date.strftime('%m/%d/%Y')}.{self.end_date.strftime('%m/%d/%Y')}'
+            self.Id = f'ETs/{self.start_date.strftime('%Y-%m-%d')}.{self.end_date.strftime('%Y-%m-%d')}'
         return super().model_post_init(__context)
 
     def doc(self):
         return {
             'Id': self.Id,
-            'start_date': self.start_date.strftime('%m/%d/%Y'), 
-            'end_date': self.end_date.strftime('%m/%d/%Y')
+            'start_date': self.start_date.strftime('%Y-%m-%d'), 
+            'end_date': self.end_date.strftime('%Y-%m-%d')
         }
 
 class SquadUnit(BaseModel):

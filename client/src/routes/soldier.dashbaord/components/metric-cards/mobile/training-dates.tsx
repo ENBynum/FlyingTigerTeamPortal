@@ -5,8 +5,7 @@ import { Button, Card, Group, ScrollArea, Stack, Text, Title } from '@mantine/co
 import { notifications } from '@mantine/notifications'
 
 import { AppDispatch, RootState } from '../../../../../store/main'
-import JSONResponse from '../../../../../utils/constructs/api/response'
-import { FetchTraining } from '../../../utils/api'
+import { FetchTraining, FetchTrainingReturn } from '../../../utils/api'
 import { setDrills, UserDashboardState } from '../../../utils/soldier.dashboard.slice'
 
 
@@ -18,7 +17,7 @@ export default function UpcomingTraining(): JSX.Element {
     const [viewAll, setViewAll] = useState<boolean>(false)
 
     useEffect(function (): void {
-        FetchTraining().then(function (res: JSONResponse): void {
+        FetchTraining().then(function (res: FetchTrainingReturn): void {
             if (res.error) {
                 notifications.show({ position: 'top-center', withCloseButton: false, autoClose: 3000, message: 'Failed to Populate Next Training Date', color: 'red' })
             } else {

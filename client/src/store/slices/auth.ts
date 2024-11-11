@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-import { SignInAPIResponseData } from '../../routes/sign-in/utils/sign-in-request-api.ts'
+import { AuthReturn } from '../../routes/sign-in/utils/sign-in-request-api'
 
 
 
@@ -21,7 +21,7 @@ const AuthSlice = createSlice({
 	name: 'auth',
 	initialState,
 	reducers: {
-		login: function (state, action: PayloadAction<SignInAPIResponseData>): void {
+		login: function (state, action: PayloadAction<AuthReturn>): void {
 			state.dodid = action.payload.dodid
 			state.unit_level = action.payload.unit_level
 			if (action.payload.unit_level === 'Soldier') {

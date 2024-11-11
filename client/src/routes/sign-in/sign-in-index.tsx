@@ -8,10 +8,9 @@ import { notifications } from '@mantine/notifications'
 
 import { AppDispatch, RootState } from '../../store/main.ts'
 import { AuthState, login } from '../../store/slices/auth.ts'
-import JSONResponse from '../../utils/constructs/api/response.ts'
 import SignInMobileView from './device-views/sign-in-mobile-view.tsx'
 import { SignInForm, SignInFormProvider, useSignInForm } from './utils/sign-in-form.ts'
-import SignInRequest, { SignInAPIResponseData } from './utils/sign-in-request-api.ts'
+import SignInRequest, { AuthReturn } from './utils/sign-in-request-api.ts'
 
 
 
@@ -36,24 +35,13 @@ export default function SignInRoute(): JSX.Element {
 	})
 
 	async function handleSubmit(data: SignInForm): Promise<void> {
-		const res: JSONResponse = await new SignInRequest(data).submit()
-		if (res.error) {
-			notifications.show({
-				position: 'top-center',
-				withCloseButton: false,
-				autoClose: 3000,
-				message: res.error,
-				color: 'red'
-			})
+		const req = new SignInRequest(data)
+		await req.submit()
+		if (req.response?.error) {
+			notifications.show({ position: 'top-center', withCloseButton: false, autoClose: 3000, message: req.response.error, color: 'red' })
 		} else {
-			notifications.show({
-				position: 'top-center',
-				withCloseButton: false,
-				autoClose: 3000,
-				message: 'Successfully Signed In',
-				color: 'green'
-			})
-			const data: SignInAPIResponseData = res.data as SignInAPIResponseData
+			notifications.show({ position: 'top-center', withCloseButton: false, autoClose: 3000, message: 'Successfully Signed In', color: 'green' })
+			const data: AuthReturn = req.response?.data as AuthReturn
 			dispatch(login(data))
 		}
 	}

@@ -12,17 +12,17 @@ class RSTRequest(BaseModel):
     dodid: Optional[str] = None
     unit: Optional[str] = None
     subunit: Optional[str] = None
-    absence_dates: list[datetime, datetime]
+    absence_dates: list[datetime|str, datetime|str]
     absence_periods: int
     absence_type: Literal['Excused/Absence Authorized', 'Excused/RST Authorized', 'Excused/ET Authorized', 'Exception of Unexcused Absence']
     absence_reason: str
-    makeup_dates: list[datetime, datetime]
+    makeup_dates: list[datetime|str, datetime|str]
     makeup_location: str
     makeup_trainer: str
     makeup_uniform: Literal['ACU', 'PT', 'ASU']
     makeup_remarks: Optional[str] = None
-    user_signature: Optional[str] = None
-    user_signature_date: Optional[str] = None
+    soldier_signature: Optional[str] = None
+    soldier_signature_date: Optional[str] = None
     supervisor_recommendation: Optional[Literal['Approved', 'Denied']] = None
     supervisor_signature: Optional[str] = None
     supervisor_signature_date: Optional[str] = None
@@ -30,21 +30,44 @@ class RSTRequest(BaseModel):
     commander_signature: Optional[str] = None
     commander_signature_date: Optional[str] = None
 
-    def doc(self):
+    def save_doc(self):
         return {
             'Id': self.Id,
             'dodid': self.dodid,
-            'absence_dates': [self.absence_dates[0].strftime('%m/%d/%Y'), self.absence_dates[1].strftime('%m/%d/%Y')],
+            'absence_dates': [self.absence_dates[0].strftime('%Y-%m-%d'), self.absence_dates[1].strftime('%Y-%m-%d')],
             'absence_periods': self.absence_periods,
             'absence_type': self.absence_type,
             'absence_reason': self.absence_reason,
-            'makeup_dates': [self.makeup_dates[0].strftime('%m/%d/%Y'), self.makeup_dates[1].strftime('%m/%d/%Y')],
+            'makeup_dates': [self.makeup_dates[0].strftime('%Y-%m-%d'), self.makeup_dates[1].strftime('%Y-%m-%d')],
             'makeup_location': self.makeup_location,
             'makeup_trainer': self.makeup_trainer,
             'makeup_uniform': self.makeup_uniform,
             'makeup_remarks': self.makeup_remarks,
-            'user_signature': self.user_signature,
-            'user_signature_date': self.user_signature_date,
+            'soldier_signature': self.soldier_signature,
+            'soldier_signature_date': self.soldier_signature_date,
+            'supervisor_recommendation': self.supervisor_recommendation,
+            'supervisor_signature': self.supervisor_signature,
+            'supervisor_signature_date': self.supervisor_signature_date,
+            'commander_decision': self.commander_decision,
+            'commander_signature': self.commander_signature,
+            'commander_signature_date': self.commander_signature_date
+        }
+    
+    def doc(self):
+        return {
+            'Id': self.Id,
+            'dodid': self.dodid,
+            'absence_dates': [self.absence_dates[0], self.absence_dates[1]],
+            'absence_periods': self.absence_periods,
+            'absence_type': self.absence_type,
+            'absence_reason': self.absence_reason,
+            'makeup_dates': [self.makeup_dates[0], self.makeup_dates[1]],
+            'makeup_location': self.makeup_location,
+            'makeup_trainer': self.makeup_trainer,
+            'makeup_uniform': self.makeup_uniform,
+            'makeup_remarks': self.makeup_remarks,
+            'soldier_signature': self.soldier_signature,
+            'soldier_signature_date': self.soldier_signature_date,
             'supervisor_recommendation': self.supervisor_recommendation,
             'supervisor_signature': self.supervisor_signature,
             'supervisor_signature_date': self.supervisor_signature_date,
@@ -53,14 +76,14 @@ class RSTRequest(BaseModel):
             'commander_signature_date': self.commander_signature_date
         }
 
-    def set_user_signature(self, dodid: str) -> bool:
+    def set_soldier_signature(self, dodid: str) -> bool:
         with PortalDB().store().open_session() as portal_session:
             profile = portal_session.load(f'Profiles/{dodid}', Profile)
             if profile is None:
                 return False
             
             if self.Id is None:
-                self.Id = f'RSTRequests/{profile.dodid}.{self.absence_dates[0].strftime('%m%d%Y')}.{self.absence_dates[1].strftime('%m%d%Y')}'
+                self.Id = f'RSTRequests/{profile.dodid}.{self.absence_dates[0].strftime('%Y-%m-%d')}.{self.absence_dates[1].strftime('%Y-%m-%d')}'
             if self.dodid is None:
                 self.dodid = dodid
             
@@ -77,10 +100,10 @@ class RSTRequest(BaseModel):
             
             now = datetime.now(UTC)
             if profile.name.middle is not None and profile.name.middle != '':
-                self.user_signature = 'Digitally Signed: ' + f'{profile.dodid}.{profile.name.first}.{profile.name.middle[0]}.{profile.name.last}.{now.timestamp()}'.upper()
+                self.soldier_signature = 'Digitally Signed: ' + f'{profile.dodid}.{profile.name.first}.{profile.name.middle[0]}.{profile.name.last}.{now.timestamp()}'.upper()
             else:
-                self.user_signature = 'Digitally Signed: ' + f'{profile.dodid}.{profile.name.first}.{profile.name.last}.{now.timestamp()}'.upper()
-            self.user_signature_date = now.strftime('%m/%d/%Y')
+                self.soldier_signature = 'Digitally Signed: ' + f'{profile.dodid}.{profile.name.first}.{profile.name.last}.{now.timestamp()}'.upper()
+            self.soldier_signature_date = now.strftime('%Y-%m-%d')
             
             return True
 
@@ -107,7 +130,7 @@ class RSTRequest(BaseModel):
                     self.supervisor_signature = 'Digitally Signed: ' + f'{profile.dodid}.{profile.name.first}.{profile.name.middle[0]}.{profile.name.last}.{now.timestamp()}'.upper()
                 else:
                     self.supervisor_signature = 'Digitally Signed: ' + f'{profile.dodid}.{profile.name.first}.{profile.name.last}.{now.timestamp()}'.upper()
-                self.supervisor_signature_date = now.strftime('%m/%d/%Y')
+                self.supervisor_signature_date = now.strftime('%Y-%m-%d')
                 return True
 
     def set_commander_signature(self, decision: Literal['Approved', 'Denied'], dodid: str) -> bool:
@@ -133,5 +156,5 @@ class RSTRequest(BaseModel):
                     self.commander_signature = 'Digitally Signed: ' + f'{profile.dodid}.{profile.name.first}.{profile.name.middle[0]}.{profile.name.last}.{now.timestamp()}'.upper()
                 else:
                     self.commander_signature = 'Digitally Signed: ' + f'{profile.dodid}.{profile.name.first}.{profile.name.last}.{now.timestamp()}'.upper()
-                self.commander_signature_date = now.strftime('%m/%d/%Y')
+                self.commander_signature_date = now.strftime('%Y-%m-%d')
                 return True

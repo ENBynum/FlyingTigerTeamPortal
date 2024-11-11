@@ -1,5 +1,4 @@
 import server from '../../../utils/axios/axiosConfig'
-import JSONResponse from '../../../utils/constructs/api/response'
 
 
 
@@ -9,7 +8,7 @@ export interface SignInRequestData {
 }
 
 
-export interface SignInAPIResponseData {
+export interface AuthReturn {
 	dodid: string
 	unit_level: 'Soldier' | 'Squad' | 'Platoon' | 'Company'
 }
@@ -18,24 +17,21 @@ export interface SignInAPIResponseData {
 export default class SignInRequest {
 	email: string
 	password: string
+	response?: { data?: AuthReturn, status: number, error?: string }
 
 	constructor({ email, password }: SignInRequestData) {
 		this.email = email
 		this.password = password
 	}
 
-	async submit(): Promise<JSONResponse> {
+	async submit(): Promise<void> {
 		try {
 			const res = await server.post(import.meta.env.VITE_SERVER_DOMAIN + import.meta.env.VITE_SERVER_SIGN_IN_ROUTE, this.doc())
-			return new JSONResponse({ data: res.data, status: res.status, error: undefined })
+			this.response = { data: res.data, status: res.status }
 			// eslint-disable-next-line
 		} catch (error: any) {
 			console.log(error)
-			return new JSONResponse({
-				data: undefined,
-				status: error.status,
-				error: error || 'Failed to Authenticate'
-			})
+			this.response = { status: error.status, error: error.response.data.detail || 'Failed to Sign In' }
 		}
 	}
 

@@ -1,5 +1,5 @@
-from utils.crud.delete_exp_tokens import delete_exp_tokens
+from utils.crud.delete_expired_tokens import delete_expired_tokens
 
 __all__ = [
-    'delete_exp_tokens'
+    'delete_expired_tokens'
 ]

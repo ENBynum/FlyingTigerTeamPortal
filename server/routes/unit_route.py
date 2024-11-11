@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from models import Profile, CompanyUnit, PlatoonUnit, SquadUnit, Drill
 from starlette.responses import JSONResponse
 from utils.JSONResponseWithTokens import JSONResponseWithTokens
@@ -8,12 +8,12 @@ from utils.raven_database.databases import PortalDB
 
 load_dotenv()
 
-unit_router = APIRouter()
+unit_router = APIRouter(prefix='/api/unit')
 
 @unit_router.get('/training/dates', status_code=status.HTTP_200_OK)
 def battle_assembies(dodid: str = Depends(authenticated)):
     if not dodid:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'message': 'Not Authenticated'})
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Not Authenticated')
     
     try:
         with PortalDB.store().open_session() as portal_session:
@@ -26,7 +26,7 @@ def battle_assembies(dodid: str = Depends(authenticated)):
             
             return JSONResponseWithTokens(dodid=dodid, content={'training': drills})
     except Exception as error:
-        return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={'message': error})
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=error)
     
 @unit_router.get('/companies', status_code=status.HTTP_200_OK)
 def companies():
