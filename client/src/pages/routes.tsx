@@ -8,19 +8,19 @@ import SignInRoute from './pages.unprotected/sign_in'
 
 
 export const routes = {
-    home: '/',
-    signIn: '/sign-in',
-    register: '/register',
-    soldierDashboard: '/soldier/dashboard/:dodid',
-    soldierRSTSubmit: '/soldier/rst/submit/:dodid'
+	home: '/',
+	signIn: '/sign-in',
+	register: '/register',
+	soldierDashboard: '/soldier/dashboard/:dodid',
+	soldierAbsenceSubmit: '/soldier/training/absence/submit/:dodid'
 }
 
 const PortalRouter = createBrowserRouter([
-    { path: routes.home, element: <HomeRoute /> },
-    { path: routes.signIn, element: <SignInRoute /> },
-    // Protected Routes - Soldier
-    { path: routes.soldierDashboard, element: <SoldierDashboardRoute /> },
-    { path: routes.soldierRSTSubmit, element: <SoldierRSTSubmitRoute /> }
+	{ path: routes.home, element: <HomeRoute/> },
+	{ path: routes.signIn, element: <SignInRoute/> },
+	// Protected Routes - Soldier
+	{ path: routes.soldierDashboard, element: <SoldierDashboardRoute/> },
+	{ path: routes.soldierAbsenceSubmit, element: <SoldierRSTSubmitRoute/> }
 ])
 
 export default PortalRouter

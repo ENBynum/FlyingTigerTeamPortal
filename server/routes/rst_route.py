@@ -1,70 +1,28 @@
 from datetime import UTC, datetime
+from typing import Literal
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, HTTPException, status
-from models import DecisionRequest, RSTRequest
+from pydantic import BaseModel
+from models.training import RSTRequest
 from starlette.responses import JSONResponse
 from utils.JSONResponseWithTokens import JSONResponseWithTokens
-from utils.middleware.authenticate import authenticated
+from middleware.authenticated import authenticated
 from utils.raven_database.databases import PortalDB
 
 load_dotenv()
 
 rst_router = APIRouter(prefix='/api/rst')
 
-@rst_router.get('/soldier/pending', status_code=status.HTTP_200_OK)
-def pending_rst_requests(dodid: str = Depends(authenticated)):
-    if not dodid:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'message': 'Not Authenticated'})
-    
-    try:
-        with PortalDB.store().open_session() as portal_session:
-            rst_requests = list(portal_session.query(object_type=RSTRequest).where_equals('dodid', dodid).and_also().where_equals('commander_signature', None))
-            requests = []
-            for request in rst_requests:
-                if request.absence_dates[0].timestamp() >= datetime.now(UTC).timestamp():
-                    requests.append(request.doc())
-            return JSONResponseWithTokens(dodid=dodid, content={'requests': requests})
-    except Exception as error:
-        return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={'message': error})
-    
-@rst_router.get('/user/completed', status_code=status.HTTP_200_OK)
-def completed_rst_requests(dodid: str = Depends(authenticated)):
-    if not dodid:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'message': 'Not Authenticated'})
-    
-    try:
-        with PortalDB.store().open_session() as portal_session:
-            rst_requests = list(portal_session.query(object_type=RSTRequest).where_equals('dodid', dodid).and_also().where_not_equals('commander_signature', None))
-            requests = []
-            for request in rst_requests:
-                if request.absence_dates[0].strptime('%Y-%m-%d').timestamp() >= datetime.now(UTC).timestamp():
-                    requests.append(request.doc())
-            return JSONResponseWithTokens(dodid=dodid, content={'requests': requests})
-    except Exception as error:
-        return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={'message': error})
+RSTRouter = APIRouter(prefix='/api/rst')
 
-@rst_router.get('/user/past', status_code=status.HTTP_200_OK)
-def past_rst_requests(dodid: str = Depends(authenticated)):
-    if not dodid:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'message': 'Not Authenticated'})
-    
-    try:
-        with PortalDB.store().open_session() as portal_session:
-            rst_requests = list(portal_session.query(object_type=RSTRequest).where_equals('dodid', dodid))
-            requests = []
-            for request in rst_requests:
-                if request.absence_dates[0].timestamp() < datetime.now(UTC).timestamp():
-                    requests.append(request.doc())
-            return JSONResponseWithTokens(dodid=dodid, content={'requests': requests})
-    except Exception as error:
-        return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={'message': error})
+class DecisionRequest(BaseModel):
+    request_id: str
+    decision: Literal['Approved', 'Denied']
 
-@rst_router.post('/new', status_code=status.HTTP_201_CREATED)
-def new_rst_request(req: RSTRequest, dodid: str = Depends(authenticated)):
+@RSTRouter.post('/new', status_code=status.HTTP_201_CREATED)
+def RST_New(req: RSTRequest, dodid: str = Depends(authenticated)):
     if not dodid:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, 'Not Authenticated')
-    
-    print(req)
 
     if not req.set_soldier_signature(dodid):
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, 'Not Authorized')
@@ -77,6 +35,19 @@ def new_rst_request(req: RSTRequest, dodid: str = Depends(authenticated)):
         raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Failed to Submit RST Request')
 
     return JSONResponseWithTokens(dodid=dodid)
+
+@RSTRouter.get(path='/soldier/dashboard', status_code=status.HTTP_200_OK)
+def RST_Soldier_Dashboard(dodid: str = Depends(authenticated)):
+    if not dodid:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, 'Not Authenticated')
+    
+    with PortalDB().store().open_session() as portal:
+        requests = list(portal.query_collection('RSTRequests', RSTRequest).where_equals('dodid', dodid))
+        if len(requests) != 0:
+            requests.sort(key=lambda request: request.absence_dates[0].timestamp())
+            requests = [request.doc() for request in requests]
+
+        return JSONResponseWithTokens(dodid, {'requests': requests})
 
 @rst_router.put('/supervisor-decision', status_code=status.HTTP_200_OK)
 def supervisor_decision(req: DecisionRequest, dodid: str = Depends(authenticated)):

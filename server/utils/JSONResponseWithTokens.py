@@ -4,7 +4,7 @@ from datetime import UTC, datetime, timedelta
 import jwt
 from dotenv import load_dotenv
 from fastapi.responses import JSONResponse
-from models import RefreshToken
+from models.auth import RefreshToken
 from utils.raven_database.databases import AuthDB
 
 load_dotenv()

@@ -1,9 +1,11 @@
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, HTTPException, status
-from models import Profile, CompanyUnit, PlatoonUnit, SquadUnit, Drill
+from models import Profile
+from models.unit import CompanyUnit, PlatoonUnit, SquadUnit
+from models.training import Drill
 from starlette.responses import JSONResponse
 from utils.JSONResponseWithTokens import JSONResponseWithTokens
-from utils.middleware.authenticate import authenticated
+from middleware.authenticated import authenticated
 from utils.raven_database.databases import PortalDB
 
 load_dotenv()

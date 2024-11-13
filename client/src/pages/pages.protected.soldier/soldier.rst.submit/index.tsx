@@ -1,15 +1,16 @@
 import { useDocumentTitle } from '@mantine/hooks'
 import { notifications } from '@mantine/notifications'
 import { useEffect } from 'react'
-import { isMobileOnly } from 'react-device-detect'
+import { isDesktop, isMobileOnly } from 'react-device-detect'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import GetSoldierTrainingDrills from '../../../services/soldier/get.soldier.training.drills.ts'
+import PostSoldierAbsence from '../../../services/soldier/post.soldier.absence.ts'
 
 import { AppDispatch, AppState } from '../../app.store'
 import SoldierLayout from '../soldier.layout'
+import SoldierRSTSubmitDesktop from './desktop'
 import SoldierRSTSubmitMobile from './mobile'
-import { FetchTraining } from './services/get.training'
-import { SubmitRequest } from './services/post.rst_request.ts'
 import { RSTForm, RSTFormProvider, useRSTForm } from './soldier.rst.submit.form'
 import { setDrillDates } from './soldier.rst.submit.slice'
 
@@ -23,7 +24,7 @@ export default function SoldierRSTSubmitRoute(): JSX.Element {
 	const navigate = useNavigate()
 	
 	useEffect(function (): void {
-		FetchTraining().then(function (res): void {
+		GetSoldierTrainingDrills().then(function (res): void {
 			if ('error' in res) {
 				notifications.show({
 					position: 'top-center',
@@ -33,9 +34,10 @@ export default function SoldierRSTSubmitRoute(): JSX.Element {
 					color: 'red'
 				})
 			} else {
-				dispatch(setDrillDates(res.training))
+				dispatch(setDrillDates(res))
 			}
 		})
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 	
 	const form = useRSTForm({
@@ -60,8 +62,8 @@ export default function SoldierRSTSubmitRoute(): JSX.Element {
 	})
 	
 	async function handleSubmit(data: RSTForm): Promise<void> {
-		const res = await SubmitRequest(data)
-		if (res) {
+		const res = await PostSoldierAbsence(data)
+		if ('error' in res) {
 			notifications.show({
 				position: 'top-center',
 				withCloseButton: false,
@@ -77,7 +79,7 @@ export default function SoldierRSTSubmitRoute(): JSX.Element {
 				position: 'top-center',
 				withCloseButton: false,
 				autoClose: 3000,
-				message: 'RST Request Submitted',
+				message: res.response,
 				color: 'green'
 			})
 			navigate(auth.dashboard_route as string)
@@ -87,7 +89,8 @@ export default function SoldierRSTSubmitRoute(): JSX.Element {
 	return <SoldierLayout>
 		<form onSubmit={form.onSubmit(handleSubmit)} style={{ width: '100%', height: '100%' }}>
 			<RSTFormProvider form={form}>
-				{isMobileOnly ? <SoldierRSTSubmitMobile/> : <div/>}
+				{isDesktop && <SoldierRSTSubmitDesktop/>}
+				{isMobileOnly && <SoldierRSTSubmitMobile/>}
 			</RSTFormProvider>
 		</form>
 	</SoldierLayout>

@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { DateTime } from 'luxon'
+import { AbsenceTypes } from '../../../types/training.ts'
 
-import { AbsenceTypes } from '../../../types/rst'
 import { Drill } from '../../../types/unit'
 import { ABSENCE_TYPE_TOOLTIPS } from '../../../variables/rst'
 
@@ -28,7 +28,6 @@ const SoldierRSTSubmitSlice = createSlice({
 	initialState,
 	reducers: {
 		setDrillDates: function (state, action: PayloadAction<Drill[]>): void {
-			console.log(action.payload)
 			const enabled_values: number[] = []
 			action.payload.map(function (value: Drill): void {
 				enabled_values.push(DateTime.fromISO(value.start_date).valueOf())

@@ -2,11 +2,11 @@ import { Container, Group, ScrollArea, Stack } from '@mantine/core'
 import { useElementSize } from '@mantine/hooks'
 import { ReactNode } from 'react'
 import { useMobileOrientation } from 'react-device-detect'
-import Absence from '../components/absence'
-import AbsenceDates from '../components/absence_dates'
-import Controls from '../components/controls'
-import CancelConfirm from '../components/controls/01_cancel_confirm.tsx'
-import Makeup from '../components/makeup'
+import CancelConfirm from '../components/cancel_confirm.modal.tsx'
+import ControlButtons from '../components/controls'
+import Absence from './absence'
+import AbsenceDates from './absence_dates'
+import Makeup from './makeup'
 
 
 
@@ -21,7 +21,7 @@ export default function SoldierRSTSubmitMobile(): ReactNode {
 				<AbsenceDates/>
 				<Absence/>
 				<Makeup/>
-				<Controls width={'100%'}/>
+				<ControlButtons width={'100%'}/>
 			</Stack>}
 		{isLandscape && <Group w={'100%'} gap={'1rem'} pt={0} px={'xs'} pb={'1.5rem'}>
 			<AbsenceDates reference={ref}/>
@@ -31,7 +31,7 @@ export default function SoldierRSTSubmitMobile(): ReactNode {
 					<Stack w={'100%'} justify={'center'} align={'center'} gap={'2rem'} pb={'2rem'}>
 						<Absence/>
 						<Makeup/>
-						<Controls width={'100%'}/>
+						<ControlButtons width={'100%'}/>
 					</Stack>
 				</ScrollArea>
 			</Container>
