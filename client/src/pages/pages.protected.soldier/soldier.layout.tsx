@@ -1,10 +1,10 @@
 import { AspectRatio, Burger, Center, Container, Grid, Group, Image, Menu, Stack } from '@mantine/core'
 import { NotificationData, notifications, useNotifications } from '@mantine/notifications'
-import { CSSProperties, useEffect, useState } from 'react'
+import { CSSProperties, ReactNode, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
+import GetAuthentication from '../../services/auth/get.authentication.ts'
 
-import Authenticate from '../../services/auth/get.authenticate.ts'
 import { AppDispatch, AppState } from '../app.store'
 import { login } from '../auth.slice'
 import Page from '../pages.layout'
@@ -13,11 +13,11 @@ import { routes } from '../routes'
 
 
 interface Props {
-	children: JSX.Element
+	children: ReactNode
 }
 
 
-export default function SoldierLayout({ children }: Props): JSX.Element {
+export default function SoldierLayout({ children }: Props): ReactNode {
 	const header_height: CSSProperties['height'] = '4rem'
 	const app_height: CSSProperties['height'] = `calc(100% - ${header_height})`
 	
@@ -35,7 +35,7 @@ export default function SoldierLayout({ children }: Props): JSX.Element {
 				navigate(auth.dashboard_route)
 			}
 		} else {
-			Authenticate().then(function (res): void {
+			GetAuthentication().then(function (res): void {
 				if ('error' in res) {
 					const notification: NotificationData = {
 						id: 'soldier.layout.failed.authentication',
@@ -54,7 +54,8 @@ export default function SoldierLayout({ children }: Props): JSX.Element {
 				}
 			})
 		}
-	}, [])
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [auth.dashboard_route, auth.dodid, auth.unit_level])
 	
 	return <Page>
 		{!authorized ? <div/> :
@@ -73,7 +74,7 @@ interface HeaderProps {
 }
 
 
-function Header({ height }: HeaderProps): JSX.Element {
+function Header({ height }: HeaderProps): ReactNode {
 	return <>
 		<Container fluid w={'100%'} h={height} px={'md'}>
 			<Grid w={'100%'} h={'100%'}>
@@ -93,7 +94,7 @@ function Header({ height }: HeaderProps): JSX.Element {
 	</>
 }
 
-function HeaderMenu(): JSX.Element {
+function HeaderMenu(): ReactNode {
 	const location = useLocation().pathname
 	const navigate = useNavigate()
 	const auth = useSelector((state: AppState) => state.auth)
